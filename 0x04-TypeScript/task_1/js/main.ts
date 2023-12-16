@@ -30,3 +30,38 @@ interface Teacher {
   };
   
   console.log(director1);
+
+  interface PrintTeacherFunction {
+    (firstName: string, lastName: string): string;
+  }
+  
+  const printTeacher: PrintTeacherFunction = function(firstName, lastName) {
+    return `${firstName.charAt(0)}.${lastName}`;
+  };
+
+  interface StudentClassInterface  {
+    workOnHomework(): string;
+    displayName(): string;
+  }
+  
+  interface StudentConstructor {
+    new(firstName: string, lastName: string): StudentClassInterface;
+  }
+  
+  class StudentClass implements StudentClassInterface {
+    firstName: string;
+    lastName: string;
+  
+    constructor(firstName: string, lastName: string) {
+      this.firstName = firstName;
+      this.lastName = lastName;
+    }
+  
+    workOnHomework(): string {
+      return 'Currently working';
+    }
+  
+    displayName(): string {
+      return this.firstName;
+    }
+  }
