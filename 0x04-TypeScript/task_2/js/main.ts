@@ -51,6 +51,7 @@ function createEmployee(salary: number | string): Director | Teacher {
     }
 }
 
+// Task 6
 // Define the isDirector function as a type predicate
 function isDirector(employee: Director | Teacher): employee is Director {
     return (employee as Director).workDirectorTasks !== undefined;
@@ -65,6 +66,7 @@ function executeWork(employee: Director | Teacher) {
     }
 }
 
+// Task 7
 // Define the Subjects type
 type Subjects = "Math" | "History";
 
