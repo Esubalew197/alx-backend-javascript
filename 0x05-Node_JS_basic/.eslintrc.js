@@ -1,13 +1,9 @@
 module.exports = {
     "env": {
         "browser": true,
-        "commonjs": true,
         "es2021": true
     },
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
-    ],
+    "extends": "airbnb-base",
     "overrides": [
         {
             "env": {
@@ -21,13 +17,10 @@ module.exports = {
             }
         }
     ],
-    "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": "latest"
+        "ecmaVersion": "latest",
+        "sourceType": "module"
     },
-    "plugins": [
-        "@typescript-eslint"
-    ],
     "rules": {
     }
 }
