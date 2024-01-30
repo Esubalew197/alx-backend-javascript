@@ -1,75 +1,70 @@
 const http = require('http');
 const { readFile } = require('fs');
 
-function countStudents(path) {
-  return new Promise((resolve, reject) => (
-    readFile(path, 'utf8', (err, data) => {
-      if (err) reject(new Error('Cannot load the database'));
-      if (data) {
-        const result = [];
-        const list = data.toString('utf-8').trim().split('\n');
-        const field = {};
-        const head = list[0].split(',');
-        const arr = [];
-        for (const i in list) {
-          if (i !== '0') {
-            const obj = {};
-            const item = list[i].split(',');
-            for (const j in item) {
-              if (j) {
-                if (j === '3' && Object.hasOwn(field, item[j])) {
-                  field[item[j]] += 1;
-                }
-                if (j === '3' && !Object.hasOwn(field, item[j])) {
-                  field[item[j]] = 1;
-                }
-                obj[head[j]] = item[j];
-              }
+const hostname = 'localhost';
+const port = 1245;
+
+function countStudents(fileName) {
+  const students = {};
+  const fields = {};
+  let length = 0;
+  return new Promise((resolve, reject) => {
+    readFile(fileName, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        let output = '';
+        const lines = data.toString().split('\n');
+        for (let i = 0; i < lines.length; i += 1) {
+          if (lines[i]) {
+            length += 1;
+            const field = lines[i].toString().split(',');
+            if (Object.prototype.hasOwnProperty.call(students, field[3])) {
+              students[field[3]].push(field[0]);
+            } else {
+              students[field[3]] = [field[0]];
             }
-            arr.push(obj);
+            if (Object.prototype.hasOwnProperty.call(fields, field[3])) {
+              fields[field[3]] += 1;
+            } else {
+              fields[field[3]] = 1;
+            }
           }
         }
-        result.push(`\nNumber of students: ${list.length - 1}`);
-        const key = Object.keys(field);
-        for (const i in key) {
-          if (i) {
-            result.push(
-              `Number of students in ${key[i]}: ${field[key[i]]}. List: ${arr
-                .filter((item) => item.field === key[i])
-                .map((item) => item.firstname)
-                .join(', ')}`,
-            );
+        const l = length - 1;
+        output += `Number of students: ${l}\n`;
+        for (const [key, value] of Object.entries(fields)) {
+          if (key !== 'field') {
+            output += `Number of students in ${key}: ${value}. `;
+            output += `List: ${students[key].join(', ')}\n`;
           }
         }
-        resolve(result.join('\n'));
+        resolve(output);
       }
-    })));
+    });
+  });
 }
 
-const PORT = 1245;
 const app = http.createServer((req, res) => {
-  if (req.method === 'GET') {
-    if (req.url === '/') {
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'text/plain');
-      res.end('Hello Holberton School!');
-    } else if (req.url === '/students') {
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'text/plain');
-      countStudents('database.csv')
-        .then((data) => {
-          res.write('This is the list of our students');
-          res.end(data);
-        })
-        .catch((error) => {
-          res.end(error);
-        });
-    }
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  if (req.url === '/') {
+    res.write('Hello Holberton School!');
+    res.end();
+  }
+  if (req.url === '/students') {
+    res.write('This is the list of our students\n');
+    countStudents(process.argv[2].toString()).then((output) => {
+      const outString = output.slice(0, -1);
+      res.end(outString);
+    }).catch(() => {
+      res.statusCode = 404;
+      res.end('Cannot load the database');
+    });
   }
 });
 
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(port, hostname, () => {
 });
 
 module.exports = app;
